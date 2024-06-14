@@ -21,7 +21,7 @@
 - Collaborated with cross-functional team to facilitate successful project implementations, ensuring timely delivery and alignment with business goals
 
 ## Projects
-###Investigating Fake News: Role of Emotions and Sentiments on the Spread of Misinformation
+### Investigating Fake News: Role of Emotions and Sentiments on the Spread of Misinformation
 [Publication](https://scholarworks.calstate.edu/concern/projects/3r075228j)
 
 Developed a comprehensive analysis framework for examining the spread of various types of misinformation on Twitter following the death of a young Iranian girl, Mahsa Amini. This study utilized **Python** libraries such as NLTK, NRCLEX for emotion analysis, and VADER for sentiment analysis to process a dataset of tweets tagged with #MahsaAmini over a three-month period. By employing binomial logistic regression and negative binomial regression analyses, the research model illuminated the determinants of misinformation behaviors during social crises, drawing on frameworks of rumor mongering and rumor/truth diffusion. The findings highlighted a prevalence of negative messages, with extreme negative emotions like fear and anger receiving the highest scores. Statistically significant results from regression analyses supported hypotheses related to the spread and believability of misinformation. This interdisciplinary study bridges information systems, communication, and political science, providing a robust model for future research and practical interventions aimed at combating misinformation.
