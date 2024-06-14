@@ -7,7 +7,7 @@
 - B.S., Business Administration and Management | California State University, Long Beach (_May 2019_)
 
 ## Work Experience
-** Graduate Student Researcher @ California State Polytechnic University, Pomona (_August 2021 – August 2023_)**
+**Graduate Student Researcher @ California State Polytechnic University, Pomona (_August 2021 – August 2023_)**
 - Led a two-year thesis project, managing data collection and analysis to investigate misinformation spread
 - Developed data structures and pipelines to organize, collect, cleanse, and standardize information for generating insights
 - Presented research findings at academic conferences, demonstrating strong oral and written communication skills
