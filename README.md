@@ -3,7 +3,7 @@
 #### Technical Skills: Python, SQL, R, Tableau, Power BI, Amazon QuickSight
 
 ## Education
-- M.S., Business Analytics | California State Polytechnic University, Pomona (_August 2023_)
+- M.S., Business Analytics                     | California State Polytechnic University, Pomona (_August 2023_)
 - B.S., Business Administration and Management | California State University, Long Beach (_May 2019_)
 
 ## Work Experience
