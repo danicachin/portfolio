@@ -34,3 +34,9 @@ Developed a comprehensive analysis framework for examining the spread of various
 Developed a comprehensive **Python** project to analyze employment statistics from the U.S. Bureau of Labor Statistics, leveraging data on private and government employment alongside presidential terms and political parties. This project aimed to provide hands-on practice with **strings, functions, files, dictionaries, numpy, dataframes, and matplotlib**.
 
 ![Emolyment Statistics](assets/US Bureau.png)
+
+### Customer Retention -- Telco Customer Churn
+[Project](R)
+
+Developed a comprehensive data mining project using **R** to predict customer churn for a telecommunications company, leveraging the Telco Customer Churn dataset from Kaggle. The project focused on understanding and reducing customer churn, which is crucial for maintaining the company's revenue base. This case study incorporated various stages of data analysis and model building to provide actionable insights for customer retention strategies.
+
