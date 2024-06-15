@@ -1,14 +1,3 @@
----
-title: "6210 Telco Project"
-author: "Kelley Yao, Lisa Witherspoon, Gabriela Perez, Danica Chin"
-date: "05/15/2022"
-output: word_document
----
-
-```{r setup, include=FALSE}
-knitr::opts_chunk$set(warning = FALSE, echo = FALSE)
-```
-
 ## Executive Summary
 Telecommunications, like many other industries, is a saturated and competitive market in which customer retention can be just as vital to revenue growth as new customer procurement. The telecommunication industry in the United States earned almost $133 billion in revenue in 2020, as the United States has one of the world's largest smartphone-using populations, behind only countries such as China and India. 
 Telecommunication companies are therefore incentivized to improve upon this revenue stream and build on their existing customer base, without losing the customers they already have. The concept of "churning" results in customers jumping ship to other companies and "is used as an indicator of the health and loyalty of a company’s subscriber base", as consistent customers make the bulk of each company's revenue stream.   Predictive analytics into customer data is a major asset for companies looking to actively prevent and therefore reduce customer turnover rather than taking the alternative reactive approach to customer loss.  
