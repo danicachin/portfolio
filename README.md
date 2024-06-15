@@ -33,3 +33,4 @@ Developed a comprehensive analysis framework for examining the spread of various
 
 Developed a comprehensive **Python** project to analyze employment statistics from the U.S. Bureau of Labor Statistics, leveraging data on private and government employment alongside presidential terms and political parties. This project aimed to provide hands-on practice with **strings, functions, files, dictionaries, numpy, dataframes, and matplotlib**.
 
+![Emolyment Statistics](assets/US Bureau.png)
