@@ -1,0 +1,380 @@
+---
+title: "6210 Telco Project"
+author: "Kelley Yao, Lisa Witherspoon, Gabriela Perez, Danica Chin"
+date: "05/15/2022"
+output: word_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(warning = FALSE, echo = FALSE)
+```
+
+## Executive Summary
+Telecommunications, like many other industries, is a saturated and competitive market in which customer retention can be just as vital to revenue growth as new customer procurement. The telecommunication industry in the United States earned almost $133 billion in revenue in 2020, as the United States has one of the world's largest smartphone-using populations, behind only countries such as China and India. 
+Telecommunication companies are therefore incentivized to improve upon this revenue stream and build on their existing customer base, without losing the customers they already have. The concept of "churning" results in customers jumping ship to other companies and "is used as an indicator of the health and loyalty of a company’s subscriber base", as consistent customers make the bulk of each company's revenue stream.   Predictive analytics into customer data is a major asset for companies looking to actively prevent and therefore reduce customer turnover rather than taking the alternative reactive approach to customer loss.  
+
+For this case study, we look at a telecommunications company, Telco, for customer data with aims to identify possible factors correlated to customer churn. These findings as well as constructing and selecting a predictive classification model forecasting customers likely to churn can contribute to higher customer retention rate through preventative action. 
+
+
+```{r Packages, include=FALSE}
+#running packages needed
+library(tidyverse)
+library(plyr)
+library(dplyr)
+library(ggplot2)
+library(caret) #used for confusion matrix
+library(e1071)
+library(MASS) #for stepwise regression
+library(gains) #drawing lift chart
+library(pROC) #calculate roc/auc
+library("rpart") #for classification trees
+library("rpart.plot")
+library("rpart")
+library(moments)
+library(car)
+options(scipen = 999)
+```
+
+```{r Summary statistics, echo=FALSE}
+#import csv file 
+telco.df <- read.csv('Telco-Customer-Churn.csv')
+telco.df <- telco.df[c(2:21)] #remove ID
+
+#combine three continuous variables to variable, then pass to stats
+variable <- c("tenure", "MonthlyCharges", "TotalCharges")
+
+summary.stats <- data.frame(
+  mean = sapply(telco.df[variable], mean, na.rm = TRUE),
+  min =sapply(telco.df[variable], min, na.rm = TRUE),
+  first_qt = sapply(telco.df[variable], quantile, probs = 0.25,na.rm = TRUE),
+  median = sapply(telco.df[variable], quantile, probs = 0.5,na.rm = TRUE),
+  third_qt = sapply(telco.df[variable], quantile, probs = 0.75,na.rm = TRUE),
+  max = sapply(telco.df[variable], max, na.rm = TRUE)
+)
+summary.stats
+
+
+#histograms of numeric 
+hist(telco.df$MonthlyCharges, main="Monthly Charges to Account",
+     xlab= "Monthly Charges",ylab= "$ USD", col = "seagreen1")
+hist(telco.df$TotalCharges, main="Total Charges to Account",
+     xlab= "Total Charges",ylab= "$ USD", col = "darkblue")
+hist(telco.df$tenure, main="Length of Account Tenure",
+     xlab= "Tenure",ylab= "Months", col = "lightblue")
+
+
+```
+
+## Data Visualization
+
+Plot variables in relation to dependent variable Churn
+
+```{r Visualization, echo=FALSE}
+
+# gender v churn
+gender.df <- data.frame(table(telco.df$Churn,telco.df$gender))
+names(gender.df) <- c("Churn","Gender","Count")
+churn <- telco.df$Churn
+gender <- telco.df$gender
+ggplot(data=gender.df, aes(x=Churn, y=Count, fill=Gender)) + 
+  geom_bar(stat="identity")
+
+#Senior Citizen v churn
+senior.df <- data.frame(table(telco.df$Churn,telco.df$SeniorCitizen))
+names(senior.df) <- c("Churn","SeniorCitizen","Count")
+SeniorCitizen <- telco.df$SeniorCitizen
+ggplot(data=senior.df, aes(x=Count, y=Churn, fill=SeniorCitizen)) + geom_bar(stat="identity")
+
+# partner v churn
+partner.df <- data.frame(table(telco.df$Churn,telco.df$Partner))
+names(partner.df) <- c("Churn","Partner","Count")
+partner <- telco.df$Partner
+ggplot(data=partner.df, aes(x=Churn, y=Count, fill=Partner)) + 
+  geom_bar(stat="identity")
+
+#Dependents vs Churn
+dependent.df <- data.frame(table(telco.df$Churn,telco.df$Dependents))
+names(dependent.df) <- c("Churn","Dependents","Count")
+dependents <- telco.df$Dependents
+ggplot(data=dependent.df, aes(x=Churn, y=Count, fill=Dependents)) + geom_bar(stat="identity")
+
+#tenure v churn
+tenure.df <- data.frame(table(telco.df$Churn,telco.df$tenure))
+names(tenure.df) <- c("Churn","Tenure","Count")
+tenure <- telco.df$tenure
+ggplot(telco.df, aes(x=as.factor(churn),y=tenure)) +
+  geom_boxplot(fill="slateblue", alpha=0.2) +
+  xlab("Churn")
+
+#bar plots - should be vs Churn?
+ggplot(telco.df, aes(x=PhoneService)) +
+  geom_bar()
+ggplot(telco.df, aes(x=MultipleLines)) +
+  geom_bar()
+ggplot(telco.df, aes(x=InternetService)) +
+  geom_bar()
+ggplot(telco.df, aes(x=OnlineSecurity)) +
+  geom_bar()
+ggplot(telco.df, aes(x=OnlineBackup)) +
+  geom_bar(fill='steelblue')
+
+#Device Protection/Tech Support/StreamingTV/StreamingMovies/Contract
+
+telco.df.subset= telco.df [ , c("DeviceProtection", "TechSupport", "StreamingTV", "StreamingMovies", "Contract","Churn")]
+
+ggplot(data = telco.df.subset, aes(x= TechSupport)) +
+  geom_bar (stat = "count" , position =position_dodge()) +
+  facet_grid(Contract ~ Churn)
+
+
+ggplot(data = telco.df.subset, aes(x= Contract)) +
+  geom_bar (stat = "count" , position =position_dodge()) +
+  facet_grid(DeviceProtection ~ Churn)
+
+
+ggplot(data = telco.df, aes(x= Contract)) +
+  geom_bar (stat = "count" , position =position_dodge()) +
+  facet_grid(MultipleLines ~ Churn)
+
+#paperless v churn (bar chart) -- use in log regression
+paperless.df <- data.frame(table(telco.df$Churn,telco.df$PaperlessBilling))
+names(paperless.df) <- c("Churn","PaperlessBilling","Count")
+paperless <- telco.df$PaperlessBilling
+ggplot(data=paperless.df, aes(x=Churn, y=Count, fill=PaperlessBilling)) + 
+  geom_bar(stat="identity")
+
+#payment method v churn -- log regression
+paymentMethod.df <- data.frame(table(telco.df$Churn,telco.df$PaymentMethod))
+names(paymentMethod.df) <- c("Churn","Payment","Count")
+paperless <- telco.df$PaymentMethod
+ggplot(data=paymentMethod.df, aes(x=Count, y=Churn, fill=Payment)) + 
+  geom_bar(stat="identity")
+
+#monthly charges v churn 
+monthlyCharges.df <- data.frame(table(telco.df$Churn,telco.df$MonthlyCharges))
+names(monthlyCharges.df) <- c("Churn","Monthly","Count")
+Monthly <- telco.df$MonthlyCharges
+ggplot(telco.df, aes(x=as.factor(Churn),y=Monthly)) +
+  geom_boxplot(fill="slateblue", alpha=0.2) +
+  xlab("Churn")
+
+#total charges v churn
+totalcharges.df <- data.frame(table(telco.df$Churn,telco.df$TotalCharges))
+names(totalcharges.df) <- c("Churn","Total","Count")
+total <- telco.df$TotalCharges
+ggplot(telco.df, aes(x=as.factor(Churn),y=total)) +
+  geom_boxplot(fill="slateblue", alpha=0.2) +
+  xlab("Churn")
+
+```
+## Predictive Modeling
+
+This case requires a predictive classification model.  Our group chose to pre-emptively construct two different models to test- a classification tree and a logistic regression model- and chose one model to implement on the data set based on performance evaluation metrics.  Data pre-processing included removing empty records as well as combining variable outcomes to avoid multicollinearity during regression analysis (see Data pre-processing).  Using 10-folds cross validation to partition the data set, a logistic model was constructed and tuned using step-wise backwards regression and a classification tree was created using the algorithm from rpart library in R.    
+
+
+## Logistic Regression Model
+
+The first model we attempted was a logistic regression model, as it seemed fitting. Our variable of interest was the churn variable, with a distinct "Yes" or "No" binary outcome, which we transform into a factor variable with levels "1, 0". 
+
+We first create the entire logistic regression model with all variables intact, then use backwards stepwise regression to eliminate variables that are not significant in predicting "churn". Stepwise regression is a technical guide that assists in removing variables one by one, where the smaller the AIC (Aikake information criterion), the better the model is. 
+
+```{r create model, echo=FALSE}
+#transform churn into binary - do not change to factor
+telco.logit <- telco.df
+telco.logit$Churn <- ifelse(telco.logit$Churn=="Yes", 1, 0) 
+
+set.seed(2) #for repeatable randomizing
+
+#running logistical regression with all variables using training data
+mylogit <- glm(Churn ~ ., data = telco.logit, family = "binomial", na.action = na.omit)
+summary(mylogit)
+
+# Stepwise regression model using stepAIC to determine
+step.model <- stepAIC(mylogit, direction = "backward", trace = FALSE)
+#summary(step.model) #result is 13 variables
+
+step.model$anova
+```
+## Cross validation procedure
+
+In order to train the dataset, we randomized the dataset, then split it into 10 equal sections to cross validate. The for loop in the below code takes the finalized model after backwards stepwise regression is performed and trains the model utilizing the sections we randomly split. Prediction propensity is then calculated and utilized to check the efficacy by creating a confusion matrix, gain chart and ROC/AUC. 
+
+```{r Logistic Cross Validation, echo=FALSE}
+
+
+#implement 10-folds cross validation with for loop
+#randomize data 
+folds.telcodata <- telco.logit[sample(nrow(telco.logit)),]
+folds <- cut(seq(1,nrow(folds.telcodata)),breaks=10,labels=FALSE)
+train.result <- list()
+valid.result <- list()
+pred.prob.train <- list()
+pred.prob.valid <- list()
+
+for(i in 1:10){
+  validIndexes <- which(folds==i,arr.ind=TRUE)
+  
+  validData <- folds.telcodata[validIndexes, ]
+  trainData <- folds.telcodata[-validIndexes, ]
+  
+  train.kfolds <- glm(Churn ~ SeniorCitizen + Dependents + tenure + MultipleLines + InternetService + OnlineSecurity + TechSupport + StreamingTV + StreamingMovies + Contract + PaperlessBilling + PaymentMethod +  MonthlyCharges + TotalCharges, data = trainData, family = "binomial", na.action = na.omit)
+  pred.train <- predict(train.kfolds, trainData[, -20], type = "response")
+  pred.prob.train [[i]] <- pred.train
+  train.result[[i]] <- trainData$Churn
+  
+  valid.kfolds <- glm(Churn ~ SeniorCitizen + Dependents + tenure + MultipleLines + InternetService + OnlineSecurity + TechSupport + StreamingTV + StreamingMovies + Contract + PaperlessBilling + PaymentMethod +  MonthlyCharges + TotalCharges, data = validData, family = "binomial", na.action = na.omit)
+  pred.valid <- predict(valid.kfolds, validData[, -20], type = "response")
+  pred.prob.valid [[i]] <- pred.valid
+  valid.result[[i]] <- validData$Churn
+  
+}
+
+
+#======calculating metrics for training data============
+pred.train.result <- unlist(pred.prob.train)
+train.result.actual <- unlist(train.result)
+
+pred.class.train <- ifelse(pred.train.result >= 0.5, 1, 0)
+
+test.matrix <- confusionMatrix(factor(pred.class.train, levels = c(1, 0)),
+                               factor(train.result.actual, levels = c(1, 0)))
+test.matrix #using all training data 63387 values, acc 0.8063
+
+#lift chart pt 2
+gain <- gains(train.result.actual, pred.train.result, groups = length(pred.train.result))
+plot(c(0, gain$cume.pct.of.total * sum(train.result.actual)) ~ c(0, gain$cume.obs), xlab = "# cases", ylab = "Cumulative # of Churn", main = "Lift Chart of Customer Churn (Training Data)", type = "l")
+lines(c(0, sum(train.result.actual)) ~ c(0, 63387), lty = 2)
+
+#decile lift chart 
+gain.train <- gains(train.result.actual, pred.train.result)
+heights <- gain.train$mean.resp/mean(train.result.actual)
+midpoints <- barplot(heights, names.arg = gain.train$depth, ylim = c(0, 4),
+                     xlab = "Percentile", ylab = "Mean Response",
+                     main = "Decile-wise lift chart with Training Data")
+text(midpoints, heights + 0.5, labels = round(heights, 1), cex = 0.8)
+
+#calculate roc/auc
+roc.train <- roc(train.result.actual, pred.train.result)
+plot.roc(roc.train)
+
+auc(roc.train)
+
+#=========calculate metrics with validation data===========
+pred.valid.result <- unlist(pred.prob.valid)
+valid.result.actual <- unlist(valid.result)
+
+pred.class.valid <- ifelse(pred.valid.result >= 0.5, 1, 0)
+
+confusionMatrix(factor(pred.class.valid, levels = c(1, 0)),
+                               factor(valid.result.actual, levels = c(1, 0)))
+
+#acc 0.8163
+gain.valid <- gains(valid.result.actual, pred.valid.result, groups = length(pred.valid.result))
+plot(c(0, gain.valid$cume.pct.of.total * sum(valid.result.actual)) ~ c(0, gain.valid$cume.obs), xlab = "# cases", ylab = "Cumulative # of Churn", main = "Lift Chart of Customer Churn (Validation Data)", type = "l")
+lines(c(0, sum(valid.result.actual)) ~ c(0, 7043), lty = 2)
+
+#decile lift chart 
+gain.valid.decile <- gains(valid.result.actual, pred.valid.result)
+heights <- gain.valid.decile$mean.resp/mean(valid.result.actual)
+midpoints <- barplot(heights, names.arg = gain.train$depth, ylim = c(0, 4),
+                     xlab = "Percentile", ylab = "Mean Response",
+                     main = "Decile-wise lift chart with Validation Data")
+text(midpoints, heights + 0.5, labels = round(heights, 1), cex = 0.8)
+
+
+
+#calculate roc/auc
+roc.valid <- roc(valid.result.actual, pred.valid.result)
+plot.roc(roc.valid)
+
+auc(roc.valid)
+
+
+```
+
+
+## Classification Tree model 
+
+When creating a classification tree, we first use 10-fold cross validation to partition the dataset into training and validation subset. By partitioning the dataset, we were able to increase the clarity of the node with the target variable—churn. By running the decision tree, it was resulted the variables that associated with “Churn” were Contract (Month-to-month, One year, Two year), Internet Service (DSL, Fiber Optic, No), and Tenure (number of months). We then made a prediction to test the customer churn. Based on the model, it has correctly predicted 1147 to be churn but classified an additional 722 to be churn. The model by analogy has misclassified 402 of the customers to be non-churned when actually they are. Based on the training data set, the accuracy is 79.2% and sensitivity and specificity is (40.07%, 93.36%). Whereas for the validation set’s accuracy has increase to 84.02% and sensitivity increased to 61.37%, and specificity decreased to 92.21%. 
+
+```{r Classification Tree, echo=FALSE}
+#CLASSIFICATION TREE=======================================================================================
+#10-folds cross validation for classification tree model (for loop)
+set.seed(2)
+telco.test <- telco.df
+folds.telcodata <- telco.test[sample(nrow(telco.test)),]
+folds <- cut(seq(1,nrow(folds.telcodata)), breaks=10,labels=FALSE)
+result <- list()
+result.train.churn <- list()
+result.valid <- list()
+result.valid.churn<- list()
+
+for(i in 1:10){
+  testIndexes <- which(folds==i,arr.ind=TRUE)
+  testData <- folds.telcodata[testIndexes, ]
+  trainData <- folds.telcodata[-testIndexes, ]
+  tree.model.train <- rpart(Churn ~ ., data= trainData, method = "class", 
+                      control = rpart.control(xval = 10))
+  tree.model.valid <-rpart(Churn ~ ., data= testData, method = "class", 
+                           control = rpart.control(xval = 10))
+  ev.pred.train.def <- predict(tree.model.train, trainData, type = "class")
+  ev.pred.valid.def <- predict(tree.model.valid,testData, type = "class")
+  result[[i]] <- ev.pred.train.def
+  result.train.churn[[i]]<-trainData$Churn
+  result.valid[[i]]<-ev.pred.valid.def
+  result.valid.churn[[i]]<- testData$Churn
+}
+# unlisting results for compatibility with matrix
+pred.train <- unlist(result)
+train.churn.result <- unlist(result.train.churn)
+pred.valid <- unlist(result.valid)
+valid.churn.result <- unlist(result.valid.churn)
+
+# Performance evaluation on training set
+conf.matrix.train <- confusionMatrix(pred.train, factor(train.churn.result, levels = c("Yes", "No")))
+conf.matrix.train
+
+# Performance evaluation on validation set
+conf.matrix.valid <- confusionMatrix(pred.valid, factor(valid.churn.result, levels = c("Yes", "No")))
+conf.matrix.valid
+
+```
+
+## Model Deployment with Classification Tree
+
+Results: 
+
+The best-pruned classification tree results showed the variables most associated to churning were Contract (Month-to-month, One year, Two year), Internet Service (DSL, Fiber Optic, No), and Tenure (number of months). The logistic regression showed SeniorCitizen, Dependents, Tenure, MultipleLines, InternetService, OnlineSecurity, TechSupport, StreamingTV, StreamingMovies, Contract, PaperlessBilling, PaymentMethod, MonthlyCharges and TotalCharges as significant predictors for churning.   
+
+Analysis: 
+
+Based on performance evaluation metrics from both models, we opted to use the classification tree model to better predict churn rate on the Telco data; although accuracy alone cannot determine a better model, the combined evaluation metrics (accuracy, sensitivity, etc.) of the classification tree model showed an improved performance on the validation data and was ultimately chosen to be used for the full data set. 
+
+```{r Model deployment}
+
+#===============Running tree model on entire data set=================================================
+tree.model.final<- rpart(Churn ~ ., data= telco.df, method = "class", 
+                    control = rpart.control(xval = 10))
+rpart.plot(tree.model.final)
+
+#complexity parameters
+printcp(tree.model.final)
+plotcp(tree.model.final)
+
+
+
+```
+
+## References
+
+DiRienzo, N. (2020, August 24). ISTA 321 - Data Mining. 8 Classification. Retrieved May 9, 2022, fromhttps://bookdown.org/ndirienzo/ista_321_data_mining/classification.html 
+
+Lunn, P. D., & Lyons, S. (2018). Consumer switching intentions for telecoms services: evidence from Ireland. Heliyon, 4(5), e00618. https://doi.org/10.1016/j.heliyon.2018.e00618 
+
+Malhotra, Arvind. (2013). Exploring switching behavior of US mobile phone customers. Journal of Services Marketing. 27. 13-24. 10.1108/08876041311296347. 
+
+S. O'Dea. (2020, February 27). AT&amp;T, Verizon, Sprint, T-Mobile Churn Rate 2018. Statista. Retrieved May 8, 2022, from https://www.statista.com/statistics/283511/average-monthly-churn-rate-top-wireless-carriers-us/ 
+
+Salhieh, S. M. (2019). Modeling the rationality of customers’ switching mobile services behavior. International Journal of Engineering Business Management. https://doi.org/10.1177/1847979019865411 
+
+YouGov. (2021, March 23). Cost is the main reason Americans switch phone carriers. why else do they jump ship? YouGov. Retrieved May 8, 2022, from https://today.yougov.com/topics/technology/articles-reports/2021/03/23/americans-switch-phone-carriers 
