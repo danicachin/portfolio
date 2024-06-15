@@ -1,5 +1,5 @@
 #Read in the File
-# setwd('/Users/matth/OneDrive/Desktop/5140 Project')
+# setwd('/Users/danica/OneDrive/Desktop/5140')
 
 #load turo data
 df<-readRDS(file.choose())
