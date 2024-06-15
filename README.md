@@ -40,5 +40,8 @@ Developed a comprehensive **Python** project to analyze employment statistics fr
 
 Developed a comprehensive data mining project using **R** to predict customer churn for a telecommunications company, leveraging the Telco Customer Churn dataset from Kaggle. The project focused on understanding and reducing customer churn, which is crucial for maintaining the company's revenue base. This case study incorporated various stages of data analysis and model building to provide actionable insights for customer retention strategies.
 
-![image](https://github.com/danicachin/portfolio/assets/172720985/97410a32-b10b-4bca-802d-5742a0afdad3)
+![image](https://github.com/danicachin/portfolio/assets/172720985/715a4cd9-e5c9-4c3c-bd58-84c8c3358288)
+
+
+
 
