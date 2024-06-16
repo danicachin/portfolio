@@ -35,6 +35,13 @@ Developed a comprehensive **Python** project to analyze employment statistics fr
 
 ![image](assets/US-Bureau.jpg)
 
+### Predictive Analysis of Heart Disease Using Big Data Mining Techniques
+[Project](https://github.com/danicachin/portfolio/tree/main/Heart%20Disease)
+
+In this group project, we explored the process of classifying potential heart disease using big data mining techniques. Working with a dataset of 70,000 patient records, we cleaned the data and used logistic regression and random forest models to identify key predictors of cardiovascular disease. The final dataset, consisting of 68,885 records, revealed that age, weight, systolic blood pressure, diastolic blood pressure, and cholesterol were the most significant indicators. Our models achieved an accuracy rate above 72%, with the random forest slightly outperforming logistic regression. The project highlights the importance of early prediction in improving patient outcomes and reducing healthcare costs, though it also notes limitations such as the need for more variables and precise data for better real-world application.
+
+![image](assets/heart.jpeg)
+
 ### Customer Retention -- Telco Customer Churn
 [Project](https://github.com/danicachin/portfolio/tree/main/R)
 
@@ -48,3 +55,4 @@ Developed a comprehensive data mining project using **R** to predict customer ch
 Developed a comprehensive data management project focused on the home insurance business domain as part of the GBA 6220 Group Project – Data Modeling & Data Warehouse course. Our team conducted a detailed initial study to identify the scope and business rules, followed by creating conceptual and logical database designs. We implemented the database with relevant tables and loaded real-world data. Additionally, we built a data warehouse to support decision-making, designing ER diagrams with necessary entities, facts, and dimensions. Utilizing **Microsoft BI** tools, we created insightful artifacts and presented our findings, demonstrating our proficiency in database design and data warehouse development.
 
 ![image](assets/home-insurance-getty.jpg)
+
