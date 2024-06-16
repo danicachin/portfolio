@@ -55,4 +55,3 @@ Developed a comprehensive data mining project using **R** to predict customer ch
 Developed a comprehensive data management project focused on the home insurance business domain as part of the GBA 6220 Group Project – Data Modeling & Data Warehouse course. Our team conducted a detailed initial study to identify the scope and business rules, followed by creating conceptual and logical database designs. We implemented the database with relevant tables and loaded real-world data. Additionally, we built a data warehouse to support decision-making, designing ER diagrams with necessary entities, facts, and dimensions. Utilizing **Microsoft BI** tools, we created insightful artifacts and presented our findings, demonstrating our proficiency in database design and data warehouse development.
 
 ![image](assets/home-insurance-getty.jpg)
-
