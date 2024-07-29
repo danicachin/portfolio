@@ -1,4 +1,5 @@
 # Business Analyst / Data Analyst
+###[Linkedin]([https://www.linkedin.com/in/danica-chin/])
 
 #### Technical Skills: Python, SQL, R, Tableau, Power BI, Amazon QuickSight
 
