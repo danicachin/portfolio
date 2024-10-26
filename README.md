@@ -8,6 +8,12 @@
 - B.S., Business Administration and Management | California State University, Long Beach (_May 2019_)
 
 ## Work Experience
+**Program Analyst @ Community Development Center, Inc. (_September 2024 – PRESENT_)**
+- Managed payroll processing using QuickBooks for a team of 50 employees, ensuring timely and accurate payments, resulting in a 98% satisfaction rate among staff
+- Developed and implemented budget restructuring strategies using MS. Excel, resulting in a 10% reduction in overall spending while maintaining employee benefits at competitive rates
+- Analyzed grants totaling $1.5M to identify areas for improvement and cost savings, leading to a 15% increase in funds allocated towards program development initiatives
+- Developed Power BI dashboards to visualize employee distribution and salary data across 5 locations, segmented by role (teachers vs. administration), enabling insights into regional pay trends and workforce composition for improved staffing and budgeting decisions
+
 **Graduate Student Researcher @ California State Polytechnic University, Pomona (_August 2021 – August 2023_)**
 - Led a two-year thesis project, managing data collection and analysis to investigate misinformation spread
 - Developed data structures and pipelines to organize, collect, cleanse, and standardize information for generating insights
